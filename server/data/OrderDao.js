@@ -60,7 +60,7 @@ class OrderDao {
     }
     //sanity check to see if user id exists in our database!
     await users.read(customer);
-    // Hint: Total price is computer from the list of products.
+    // Total price is computer from the list of products.
     if (!Array.isArray(products) || products.length === 0) {
       throw new ApiError(400, "Every order must have a list of products!");
     }
