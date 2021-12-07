@@ -644,4 +644,3 @@ describe(`Test ${endpoint} endpoints`, () => {
     await mongoose.connection.close();
   });
 });
-//close database properly with "afterAll"

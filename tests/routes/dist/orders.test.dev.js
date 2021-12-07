@@ -1489,4 +1489,4 @@ describe("Test ".concat(endpoint, " endpoints"), function () {
       }
     }, null, null, [[3, 14, 18, 26], [19,, 21, 25], [29, 40, 44, 52], [45,, 47, 51], [55, 66, 70, 78], [71,, 73, 77]]);
   });
-}); //close database properly with "afterAll"
+});
