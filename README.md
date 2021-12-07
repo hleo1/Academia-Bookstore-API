@@ -3,10 +3,10 @@
 This repository contains a homework submission.
 
 ```text
-JHED=
-GITHUB_USERNAME=
-GITHUB_REPO=
-HEROKU_APP=
+JHED=hleo1
+GITHUB_USERNAME=hleo1
+GITHUB_REPO=https://github.com/hleo1/homework-9-hleo1
+HEROKU_APP=https://bookstore-api-hleo1.herokuapp.com
 ```
 
 **ADMIN token:**
