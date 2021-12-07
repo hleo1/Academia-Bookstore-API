@@ -32,19 +32,10 @@ class OrderDao {
     };
   }
 
-  // When an order is created, it is in "active" state
-  async create({ customer, products }) {
-    if (customer === undefined || customer === "") {
-      throw new ApiError(400, "Every order must have a customer name!");
-    }
-    //sanity check to see if user id exists in our database!
-    await users.read(customer);
-    // Hint: Total price is computer from the list of products.
-    if (!Array.isArray(products) || products.length === 0) {
-      throw new ApiError(400, "Every order must have a list of products!");
-    }
-
+  async get_total_from_products(products) {
     let total = 0;
+
+    //calculate new total
     for (const product of products) {
       if (isNaN(product.quantity) || product.quantity <= 0) {
         throw new ApiError(400, "Product has invalid quantity!");
@@ -59,6 +50,22 @@ class OrderDao {
 
       total += product.quantity * product_info.price;
     }
+    return total;
+  }
+
+  // When an order is created, it is in "active" state
+  async create({ customer, products }) {
+    if (customer === undefined || customer === "") {
+      throw new ApiError(400, "Every order must have a customer name!");
+    }
+    //sanity check to see if user id exists in our database!
+    await users.read(customer);
+    // Hint: Total price is computer from the list of products.
+    if (!Array.isArray(products) || products.length === 0) {
+      throw new ApiError(400, "Every order must have a list of products!");
+    }
+
+    let total = await this.get_total_from_products(products);
 
     //assign a product _id?
     const order = await Order.create({
@@ -131,43 +138,21 @@ class OrderDao {
     if (!products && !status) {
       throw new ApiError(400, "Enter product/status as part of payload!");
     }
-
-      const attributes = {};
-
-      
-      if (products) {
-        let total = 0;
-        attributes.products = products;
-        //calculate new total
-        for (const product of products) {
-          if (isNaN(product.quantity) || product.quantity <= 0) {
-            throw new ApiError(400, "Product has invalid quantity!");
-          }
-
-          if (!mongoose.isValidObjectId(product.product)) {
-            throw new ApiError(400, "Invalid product ID!");
-          }
-
-          let product_info = await product_dao.read(product.product);
-          //will throw a 404 not found if product.product is not even in the database!
-
-          total += product.quantity * product_info.price;
-        }
-        attributes.total = total;
-      }
-      if (status) {
-        attributes.status = status;
-      }
-
-      
-      const new_order = await Order.findByIdAndUpdate(id, attributes, {
-        new: true,
-        runValidators: true,
-      })
-        .lean()
-        .select("-__v");
-      return this.order_formatter(new_order);
-    
+    const attributes = {};
+    if (products) {
+      attributes.products = products;
+      attributes.total = await this.get_total_from_products(products);
+    }
+    if (status) {
+      attributes.status = status;
+    }
+    const new_order = await Order.findByIdAndUpdate(id, attributes, {
+      new: true,
+      runValidators: true,
+    })
+      .lean()
+      .select("-__v");
+    return this.order_formatter(new_order);
   }
 }
 
