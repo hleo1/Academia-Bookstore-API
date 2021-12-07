@@ -1,13 +1,5 @@
 "use strict";
 
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
-
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
-
-function _iterableToArrayLimit(arr, i) { if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) { return; } var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
-
-function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -343,8 +335,7 @@ function () {
   }, {
     key: "delete",
     value: function _delete(id, customer) {
-      var _ref3, _ref4, search_order, order;
-
+      var order;
       return regeneratorRuntime.async(function _delete$(_context4) {
         while (1) {
           switch (_context4.prev = _context4.next) {
@@ -353,26 +344,14 @@ function () {
               return regeneratorRuntime.awrap(this.read(id, customer, "CUSTOMER"));
 
             case 2:
-              _ref3 = _context4.sent;
-              _ref4 = _slicedToArray(_ref3, 1);
-              search_order = _ref4[0];
-
-              if (!(search_order.customer === customer)) {
-                _context4.next = 12;
-                break;
-              }
-
-              _context4.next = 8;
+              _context4.next = 4;
               return regeneratorRuntime.awrap(Order.findByIdAndDelete(id).lean().select("-__v"));
 
-            case 8:
+            case 4:
               order = _context4.sent;
               return _context4.abrupt("return", [this.order_formatter(order)]);
 
-            case 12:
-              throw new ApiError(403, "Unauthorized to perform this action!");
-
-            case 13:
+            case 6:
             case "end":
               return _context4.stop();
           }
@@ -382,23 +361,31 @@ function () {
 
   }, {
     key: "update",
-    value: function update(id, customer, _ref5) {
+    value: function update(id, customer, _ref3) {
       var products, status, attributes, total, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, product, product_info, new_order;
 
       return regeneratorRuntime.async(function update$(_context5) {
         while (1) {
           switch (_context5.prev = _context5.next) {
             case 0:
-              products = _ref5.products, status = _ref5.status;
+              products = _ref3.products, status = _ref3.status;
               _context5.next = 3;
               return regeneratorRuntime.awrap(this.read(id, customer, "CUSTOMER"));
 
             case 3:
+              if (!(!products && !status)) {
+                _context5.next = 5;
+                break;
+              }
+
+              throw new ApiError(400, "Enter product/status as part of payload!");
+
+            case 5:
               attributes = {};
               total = 0;
 
               if (!products) {
-                _context5.next = 40;
+                _context5.next = 41;
                 break;
               }
 
@@ -406,105 +393,102 @@ function () {
               _iteratorNormalCompletion4 = true;
               _didIteratorError4 = false;
               _iteratorError4 = undefined;
-              _context5.prev = 10;
+              _context5.prev = 12;
               _iterator4 = products[Symbol.iterator]();
 
-            case 12:
+            case 14:
               if (_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done) {
-                _context5.next = 25;
+                _context5.next = 27;
                 break;
               }
 
               product = _step4.value;
 
               if (!(isNaN(product.quantity) || product.quantity <= 0)) {
-                _context5.next = 16;
+                _context5.next = 18;
                 break;
               }
 
               throw new ApiError(400, "Product has invalid quantity!");
 
-            case 16:
+            case 18:
               if (mongoose.isValidObjectId(product.product)) {
-                _context5.next = 18;
+                _context5.next = 20;
                 break;
               }
 
               throw new ApiError(400, "Invalid product ID!");
 
-            case 18:
-              _context5.next = 20;
+            case 20:
+              _context5.next = 22;
               return regeneratorRuntime.awrap(product_dao.read(product.product));
 
-            case 20:
+            case 22:
               product_info = _context5.sent;
               //will throw a 404 not found if product.product is not even in the database!
               total += product.quantity * product_info.price;
 
-            case 22:
+            case 24:
               _iteratorNormalCompletion4 = true;
-              _context5.next = 12;
-              break;
-
-            case 25:
-              _context5.next = 31;
+              _context5.next = 14;
               break;
 
             case 27:
-              _context5.prev = 27;
-              _context5.t0 = _context5["catch"](10);
+              _context5.next = 33;
+              break;
+
+            case 29:
+              _context5.prev = 29;
+              _context5.t0 = _context5["catch"](12);
               _didIteratorError4 = true;
               _iteratorError4 = _context5.t0;
 
-            case 31:
-              _context5.prev = 31;
-              _context5.prev = 32;
+            case 33:
+              _context5.prev = 33;
+              _context5.prev = 34;
 
               if (!_iteratorNormalCompletion4 && _iterator4["return"] != null) {
                 _iterator4["return"]();
               }
 
-            case 34:
-              _context5.prev = 34;
+            case 36:
+              _context5.prev = 36;
 
               if (!_didIteratorError4) {
-                _context5.next = 37;
+                _context5.next = 39;
                 break;
               }
 
               throw _iteratorError4;
 
-            case 37:
-              return _context5.finish(34);
-
-            case 38:
-              return _context5.finish(31);
-
             case 39:
-              ;
+              return _context5.finish(36);
 
             case 40:
+              return _context5.finish(33);
+
+            case 41:
               if (status) {
                 attributes.status = status;
               }
 
               attributes.total = total;
-              _context5.next = 44;
+              _context5.next = 45;
               return regeneratorRuntime.awrap(Order.findByIdAndUpdate(id, attributes, {
                 "new": true,
                 runValidators: true
               }).lean().select("-__v"));
 
-            case 44:
+            case 45:
               new_order = _context5.sent;
               return _context5.abrupt("return", this.order_formatter(new_order));
 
-            case 46:
+            case 47:
             case "end":
               return _context5.stop();
           }
         }
-      }, null, this, [[10, 27, 31, 39], [32,, 34, 38]]);
+      }, null, this, [[12, 29, 33, 41], [34,, 36, 40]]);
     }
   }]);
 

@@ -16,13 +16,11 @@ class OrderDao {
     let new_products = [];
 
     for (const product of order.products) {
-      new_products.push(
-        {
-          _id: product._id.toString(),
-          product: product.product.toString(), 
-          quantity: product.quantity
-        }
-      )
+      new_products.push({
+        _id: product._id.toString(),
+        product: product.product.toString(),
+        quantity: product.quantity,
+      });
     }
 
     return {
@@ -31,9 +29,9 @@ class OrderDao {
       products: new_products,
       total: order.total,
       status: order.status,
-    }
+    };
   }
-  
+
   // When an order is created, it is in "active" state
   async create({ customer, products }) {
     if (customer === undefined || customer === "") {
@@ -45,8 +43,6 @@ class OrderDao {
     if (!Array.isArray(products) || products.length === 0) {
       throw new ApiError(400, "Every order must have a list of products!");
     }
- 
-    
 
     let total = 0;
     for (const product of products) {
@@ -60,7 +56,7 @@ class OrderDao {
 
       let product_info = await product_dao.read(product.product);
       //will throw a 404 not found if product.product is not even in the database!
-      
+
       total += product.quantity * product_info.price;
     }
 
@@ -120,15 +116,9 @@ class OrderDao {
     //customer must be the one who placed it!
     //admins not allowed to delete others' orders
     //customers not allowe to delete others' orders
-  const [search_order] = await this.read(id, customer, "CUSTOMER");
-  if (search_order.customer === customer) {
-    const order = await Order.findByIdAndDelete(id).lean().select("-__v")
+    await this.read(id, customer, "CUSTOMER");
+    const order = await Order.findByIdAndDelete(id).lean().select("-__v");
     return [this.order_formatter(order)];
-  } else {
-    throw new ApiError(403, "Unauthorized to perform this action!");
-  }
-
-    
   }
 
   // One can update the list of products or the status of an order
@@ -138,40 +128,43 @@ class OrderDao {
     //customer must be the one who placed it!
     await this.read(id, customer, "CUSTOMER");
 
-    const attributes = {};
-
-    let total = 0;
-    if (products) {
-      attributes.products = products;
-      for (const product of products) {
-        if (isNaN(product.quantity) || product.quantity <= 0) {
-          throw new ApiError(400, "Product has invalid quantity!");
-        }
-  
-        if (!mongoose.isValidObjectId(product.product)) {
-          throw new ApiError(400, "Invalid product ID!");
-        }
-  
-        let product_info = await product_dao.read(product.product);
-        //will throw a 404 not found if product.product is not even in the database!
-        
-        total += product.quantity * product_info.price;
-      };
-    }
-    if (status) {
-      attributes.status = status;
+    if (!products && !status) {
+      throw new ApiError(400, "Enter product/status as part of payload!");
     }
 
+      const attributes = {};
+
+      let total = 0;
+      if (products) {
+        attributes.products = products;
+        for (const product of products) {
+          if (isNaN(product.quantity) || product.quantity <= 0) {
+            throw new ApiError(400, "Product has invalid quantity!");
+          }
+
+          if (!mongoose.isValidObjectId(product.product)) {
+            throw new ApiError(400, "Invalid product ID!");
+          }
+
+          let product_info = await product_dao.read(product.product);
+          //will throw a 404 not found if product.product is not even in the database!
+
+          total += product.quantity * product_info.price;
+        }
+      }
+      if (status) {
+        attributes.status = status;
+      }
+
+      attributes.total = total;
+      const new_order = await Order.findByIdAndUpdate(id, attributes, {
+        new: true,
+        runValidators: true,
+      })
+        .lean()
+        .select("-__v");
+      return this.order_formatter(new_order);
     
-    
-    attributes.total = total;
-    const new_order = await Order.findByIdAndUpdate(id, attributes, {
-      new: true,
-      runValidators: true,
-    })
-      .lean()
-      .select("-__v");
-    return this.order_formatter(new_order);
   }
 }
 

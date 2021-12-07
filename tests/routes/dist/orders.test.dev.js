@@ -252,7 +252,7 @@ describe("Test ".concat(endpoint, " endpoints"), function () {
           switch (_context4.prev = _context4.next) {
             case 0:
               _context4.next = 2;
-              return regeneratorRuntime.awrap(request.get(endpoint).set("authorization", "Bearer ".concat(tokens.customer)));
+              return regeneratorRuntime.awrap(request.get(endpoint).set("authorization", "Bearer ".concat(tokens.customer1)));
 
             case 2:
               response = _context4.sent;
@@ -1059,8 +1059,9 @@ describe("Test ".concat(endpoint, " endpoints"), function () {
           }
         }
       });
-    });
-    test("Return 400 for invalid quantity attribute", function _callee40() {
+    }); //added test
+
+    test("Return 400 for invalid product attribute", function _callee40() {
       var response;
       return regeneratorRuntime.async(function _callee40$(_context40) {
         while (1) {
@@ -1068,7 +1069,9 @@ describe("Test ".concat(endpoint, " endpoints"), function () {
             case 0:
               _context40.next = 2;
               return regeneratorRuntime.awrap(request.put("".concat(endpoint, "/").concat(sample_orders[1]._id)).set("authorization", "Bearer ".concat(tokens.customer1)).send({
-                products: [create_product_object(sample_products[0], -1)],
+                products: [create_product_object({
+                  _id: "I'm def not valid!"
+                }, 3)],
                 status: "ACTIVE"
               }));
 
@@ -1083,31 +1086,31 @@ describe("Test ".concat(endpoint, " endpoints"), function () {
         }
       });
     });
-    describe("Return 200 and the updated order for successful request", function () {
-      test("Update products, e.g., add/remove or change quantity", function _callee41() {
-        var response;
-        return regeneratorRuntime.async(function _callee41$(_context41) {
-          while (1) {
-            switch (_context41.prev = _context41.next) {
-              case 0:
-                _context41.next = 2;
-                return regeneratorRuntime.awrap(request.put("".concat(endpoint, "/").concat(sample_orders[1]._id)).set("authorization", "Bearer ".concat(tokens.customer1)).send({
-                  products: [create_product_object(sample_products[0], 3)]
-                }));
+    test("Return 400 for invalid quantity attribute", function _callee41() {
+      var response;
+      return regeneratorRuntime.async(function _callee41$(_context41) {
+        while (1) {
+          switch (_context41.prev = _context41.next) {
+            case 0:
+              _context41.next = 2;
+              return regeneratorRuntime.awrap(request.put("".concat(endpoint, "/").concat(sample_orders[1]._id)).set("authorization", "Bearer ".concat(tokens.customer1)).send({
+                products: [create_product_object(sample_products[0], -1)],
+                status: "ACTIVE"
+              }));
 
-              case 2:
-                response = _context41.sent;
-                expect(response.status).toBe(200);
-                expect(response.body.data.total).toBe(sample_products[0].price * 3);
+            case 2:
+              response = _context41.sent;
+              expect(response.status).toBe(400);
 
-              case 5:
-              case "end":
-                return _context41.stop();
-            }
+            case 4:
+            case "end":
+              return _context41.stop();
           }
-        });
+        }
       });
-      test("Update status, e.g., from ACTIVE to COMPLETE", function _callee42() {
+    });
+    describe("Return 200 and the updated order for successful request", function () {
+      test("Update products, e.g., add/remove or change quantity", function _callee42() {
         var response;
         return regeneratorRuntime.async(function _callee42$(_context42) {
           while (1) {
@@ -1115,13 +1118,13 @@ describe("Test ".concat(endpoint, " endpoints"), function () {
               case 0:
                 _context42.next = 2;
                 return regeneratorRuntime.awrap(request.put("".concat(endpoint, "/").concat(sample_orders[1]._id)).set("authorization", "Bearer ".concat(tokens.customer1)).send({
-                  status: "COMPLETE"
+                  products: [create_product_object(sample_products[0], 3)]
                 }));
 
               case 2:
                 response = _context42.sent;
                 expect(response.status).toBe(200);
-                expect(response.body.data.status).toBe("COMPLETE");
+                expect(response.body.data.total).toBe(sample_products[0].price * 3);
 
               case 5:
               case "end":
@@ -1130,58 +1133,61 @@ describe("Test ".concat(endpoint, " endpoints"), function () {
           }
         });
       });
+      test("Update status, e.g., from ACTIVE to COMPLETE", function _callee43() {
+        var response;
+        return regeneratorRuntime.async(function _callee43$(_context43) {
+          while (1) {
+            switch (_context43.prev = _context43.next) {
+              case 0:
+                _context43.next = 2;
+                return regeneratorRuntime.awrap(request.put("".concat(endpoint, "/").concat(sample_orders[1]._id)).set("authorization", "Bearer ".concat(tokens.customer1)).send({
+                  status: "COMPLETE"
+                }));
+
+              case 2:
+                response = _context43.sent;
+                expect(response.status).toBe(200);
+                expect(response.body.data.status).toBe("COMPLETE");
+
+              case 5:
+              case "end":
+                return _context43.stop();
+            }
+          }
+        });
+      });
     });
   });
   describe("Test DELETE ".concat(endpoint, "/:id"), function () {
-    test("Return 404 for invalid order ID", function _callee43() {
+    test("Return 404 for invalid order ID", function _callee44() {
       var invalid_id, response;
-      return regeneratorRuntime.async(function _callee43$(_context43) {
-        while (1) {
-          switch (_context43.prev = _context43.next) {
-            case 0:
-              invalid_id = new mongoose.Types.ObjectId();
-              _context43.next = 3;
-              return regeneratorRuntime.awrap(request["delete"]("".concat(endpoint, "/").concat(invalid_id)).set("authorization", "Bearer ".concat(tokens.customer1)));
-
-            case 3:
-              response = _context43.sent;
-              expect(response.status).toBe(404);
-
-            case 5:
-            case "end":
-              return _context43.stop();
-          }
-        }
-      });
-    });
-    test("Return 403 for missing token", function _callee44() {
-      var response;
       return regeneratorRuntime.async(function _callee44$(_context44) {
         while (1) {
           switch (_context44.prev = _context44.next) {
             case 0:
-              _context44.next = 2;
-              return regeneratorRuntime.awrap(request["delete"]("".concat(endpoint, "/").concat(sample_orders[0]._id)));
+              invalid_id = new mongoose.Types.ObjectId();
+              _context44.next = 3;
+              return regeneratorRuntime.awrap(request["delete"]("".concat(endpoint, "/").concat(invalid_id)).set("authorization", "Bearer ".concat(tokens.customer1)));
 
-            case 2:
+            case 3:
               response = _context44.sent;
-              expect(response.status).toBe(403);
+              expect(response.status).toBe(404);
 
-            case 4:
+            case 5:
             case "end":
               return _context44.stop();
           }
         }
       });
     });
-    test("Return 403 for invalid token", function _callee45() {
+    test("Return 403 for missing token", function _callee45() {
       var response;
       return regeneratorRuntime.async(function _callee45$(_context45) {
         while (1) {
           switch (_context45.prev = _context45.next) {
             case 0:
               _context45.next = 2;
-              return regeneratorRuntime.awrap(request["delete"]("".concat(endpoint, "/").concat(sample_orders[0]._id)).set("authorization", "Bearer ".concat(tokens.invalidAdmin)));
+              return regeneratorRuntime.awrap(request["delete"]("".concat(endpoint, "/").concat(sample_orders[0]._id)));
 
             case 2:
               response = _context45.sent;
@@ -1194,35 +1200,35 @@ describe("Test ".concat(endpoint, " endpoints"), function () {
         }
       });
     });
-    describe("Return 403 for unauthorized token", function () {
-      test("Admins not allowed to delete others' orders", function _callee46() {
-        var response;
-        return regeneratorRuntime.async(function _callee46$(_context46) {
-          while (1) {
-            switch (_context46.prev = _context46.next) {
-              case 0:
-                _context46.next = 2;
-                return regeneratorRuntime.awrap(request["delete"]("".concat(endpoint, "/").concat(sample_orders[1]._id)).set("authorization", "Bearer ".concat(tokens.admin)));
+    test("Return 403 for invalid token", function _callee46() {
+      var response;
+      return regeneratorRuntime.async(function _callee46$(_context46) {
+        while (1) {
+          switch (_context46.prev = _context46.next) {
+            case 0:
+              _context46.next = 2;
+              return regeneratorRuntime.awrap(request["delete"]("".concat(endpoint, "/").concat(sample_orders[0]._id)).set("authorization", "Bearer ".concat(tokens.invalidAdmin)));
 
-              case 2:
-                response = _context46.sent;
-                expect(response.status).toBe(403);
+            case 2:
+              response = _context46.sent;
+              expect(response.status).toBe(403);
 
-              case 4:
-              case "end":
-                return _context46.stop();
-            }
+            case 4:
+            case "end":
+              return _context46.stop();
           }
-        });
+        }
       });
-      test("Customers not allowed to delete others' orders", function _callee47() {
+    });
+    describe("Return 403 for unauthorized token", function () {
+      test("Admins not allowed to delete others' orders", function _callee47() {
         var response;
         return regeneratorRuntime.async(function _callee47$(_context47) {
           while (1) {
             switch (_context47.prev = _context47.next) {
               case 0:
                 _context47.next = 2;
-                return regeneratorRuntime.awrap(request["delete"]("".concat(endpoint, "/").concat(sample_orders[1]._id)).set("authorization", "Bearer ".concat(tokens.customer2)));
+                return regeneratorRuntime.awrap(request["delete"]("".concat(endpoint, "/").concat(sample_orders[1]._id)).set("authorization", "Bearer ".concat(tokens.admin)));
 
               case 2:
                 response = _context47.sent;
@@ -1235,65 +1241,85 @@ describe("Test ".concat(endpoint, " endpoints"), function () {
           }
         });
       });
-    });
-    test("Return 403 for expired token", function _callee48() {
-      var response;
-      return regeneratorRuntime.async(function _callee48$(_context48) {
-        while (1) {
-          switch (_context48.prev = _context48.next) {
-            case 0:
-              _context48.next = 2;
-              return regeneratorRuntime.awrap(request["delete"]("".concat(endpoint, "/").concat(sample_orders[1]._id)).set("authorization", "Bearer ".concat(tokens.expiredAdmin)));
+      test("Customers not allowed to delete others' orders", function _callee48() {
+        var response;
+        return regeneratorRuntime.async(function _callee48$(_context48) {
+          while (1) {
+            switch (_context48.prev = _context48.next) {
+              case 0:
+                _context48.next = 2;
+                return regeneratorRuntime.awrap(request["delete"]("".concat(endpoint, "/").concat(sample_orders[1]._id)).set("authorization", "Bearer ".concat(tokens.customer2)));
 
-            case 2:
-              response = _context48.sent;
-              expect(response.status).toBe(403);
+              case 2:
+                response = _context48.sent;
+                expect(response.status).toBe(403);
 
-            case 4:
-            case "end":
-              return _context48.stop();
+              case 4:
+              case "end":
+                return _context48.stop();
+            }
           }
-        }
+        });
       });
     });
-    test("Return 200 and the deleted order for successful request", function _callee49() {
+    test("Return 403 for expired token", function _callee49() {
       var response;
       return regeneratorRuntime.async(function _callee49$(_context49) {
         while (1) {
           switch (_context49.prev = _context49.next) {
             case 0:
               _context49.next = 2;
-              return regeneratorRuntime.awrap(request["delete"]("".concat(endpoint, "/").concat(sample_orders[1]._id)).set("authorization", "Bearer ".concat(tokens.customer1)));
+              return regeneratorRuntime.awrap(request["delete"]("".concat(endpoint, "/").concat(sample_orders[1]._id)).set("authorization", "Bearer ".concat(tokens.expiredAdmin)));
 
             case 2:
               response = _context49.sent;
-              expect(response.status).toBe(200);
-              expect(response.body.data.length).toBe(1);
-              expect(response.body.data[0]._id).toBe(sample_orders[1]._id);
+              expect(response.status).toBe(403);
 
-            case 6:
+            case 4:
             case "end":
               return _context49.stop();
           }
         }
       });
     });
+    test("Return 200 and the deleted order for successful request", function _callee50() {
+      var response;
+      return regeneratorRuntime.async(function _callee50$(_context50) {
+        while (1) {
+          switch (_context50.prev = _context50.next) {
+            case 0:
+              _context50.next = 2;
+              return regeneratorRuntime.awrap(request["delete"]("".concat(endpoint, "/").concat(sample_orders[1]._id)).set("authorization", "Bearer ".concat(tokens.customer1)));
+
+            case 2:
+              response = _context50.sent;
+              expect(response.status).toBe(200);
+              expect(response.body.data.length).toBe(1);
+              expect(response.body.data[0]._id).toBe(sample_orders[1]._id);
+
+            case 6:
+            case "end":
+              return _context50.stop();
+          }
+        }
+      });
+    });
   });
-  afterAll(function _callee50() {
-    return regeneratorRuntime.async(function _callee50$(_context50) {
+  afterAll(function _callee51() {
+    return regeneratorRuntime.async(function _callee51$(_context51) {
       while (1) {
-        switch (_context50.prev = _context50.next) {
+        switch (_context51.prev = _context51.next) {
           case 0:
-            _context50.next = 2;
+            _context51.next = 2;
             return regeneratorRuntime.awrap(mongoose.connection.db.dropDatabase());
 
           case 2:
-            _context50.next = 4;
+            _context51.next = 4;
             return regeneratorRuntime.awrap(mongoose.connection.close());
 
           case 4:
           case "end":
-            return _context50.stop();
+            return _context51.stop();
         }
       }
     });

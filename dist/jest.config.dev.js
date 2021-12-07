@@ -2,7 +2,7 @@
 
 module.exports = {
   preset: "@shelf/jest-mongodb",
-  // verbose: true,
+  verbose: true,
   collectCoverage: true,
   coverageDirectory: "coverage"
 };

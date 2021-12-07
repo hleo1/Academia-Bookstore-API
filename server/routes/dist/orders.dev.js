@@ -139,31 +139,44 @@ router.put("/api/orders/:id", checkToken, function _callee4(req, res, next) {
           _context4.prev = 0;
           id = req.params.id;
           _req$body = req.body, products = _req$body.products, status = _req$body.status;
-          _context4.next = 5;
+
+          if (!(status === "ACTIVE" || status === "COMPLETE" || status === undefined)) {
+            _context4.next = 10;
+            break;
+          }
+
+          _context4.next = 6;
           return regeneratorRuntime.awrap(orders.update(id, req.user.sub, {
             products: products,
             status: status
           }));
 
-        case 5:
+        case 6:
           data = _context4.sent;
           res.status(200).json({
             data: data
           });
-          _context4.next = 12;
+          _context4.next = 11;
           break;
 
-        case 9:
-          _context4.prev = 9;
+        case 10:
+          throw new ApiError(400, "Invalid status attribute!");
+
+        case 11:
+          _context4.next = 16;
+          break;
+
+        case 13:
+          _context4.prev = 13;
           _context4.t0 = _context4["catch"](0);
           next(_context4.t0);
 
-        case 12:
+        case 16:
         case "end":
           return _context4.stop();
       }
     }
-  }, null, null, [[0, 9]]);
+  }, null, null, [[0, 13]]);
 });
 router["delete"]("/api/orders/:id", checkToken, function _callee5(req, res, next) {
   var id, data;

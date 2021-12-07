@@ -155,7 +155,7 @@ describe(`Test ${endpoint} endpoints`, () => {
       // no query parameter after endpoint, hence customer is "trying" to see all customer orders
       const response = await request
         .get(endpoint)
-        .set("authorization", `Bearer ${tokens.customer}`);
+        .set("authorization", `Bearer ${tokens.customer1}`);
       expect(response.status).toBe(403);
     });
 
@@ -542,6 +542,23 @@ describe(`Test PUT ${endpoint}/:id`, () => {
       expect(response.status).toBe(400);
     });
 
+
+    //added test
+    test("Return 400 for invalid product attribute", async () => {
+      const response = await request
+        .put(`${endpoint}/${sample_orders[1]._id}`)
+        .set("authorization", `Bearer ${tokens.customer1}`).send(
+          {
+            products: [
+              create_product_object({_id: "I'm def not valid!"}, 3),
+            ],
+            status: "ACTIVE"
+          }
+
+        );
+      expect(response.status).toBe(400);
+    });
+
     test("Return 400 for invalid quantity attribute", async () => {
       const response = await request
         .put(`${endpoint}/${sample_orders[1]._id}`)
@@ -631,7 +648,6 @@ describe(`Test PUT ${endpoint}/:id`, () => {
     });
 
     test("Return 403 for expired token", async () => {
-      // TODO Implement me!
       const response = await request
         .delete(`${endpoint}/${sample_orders[1]._id}`)
         .set("authorization", `Bearer ${tokens.expiredAdmin}`);
@@ -640,8 +656,6 @@ describe(`Test PUT ${endpoint}/:id`, () => {
 
     test("Return 200 and the deleted order for successful request", async () => {
       // A customer may delete their order!
-      // TODO Implement me!
-
       const response = await request
         .delete(`${endpoint}/${sample_orders[1]._id}`)
         .set("authorization", `Bearer ${tokens.customer1}`);

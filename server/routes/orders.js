@@ -57,11 +57,15 @@ router.put("/api/orders/:id", checkToken, async (req, res, next) => {
   try {
     const { id } = req.params;
     const { products, status } = req.body;
-    
-    const data = await orders.update(id, req.user.sub, {
-      products, status
-    })
-    res.status(200).json({data});
+
+    if (status === "ACTIVE" || status === "COMPLETE" || status === undefined) {
+      const data = await orders.update(id, req.user.sub, {
+        products, status
+      })
+      res.status(200).json({data});
+    } else {
+      throw new ApiError(400, "Invalid status attribute!");
+    }
   } catch (err) {
     next(err);
   }

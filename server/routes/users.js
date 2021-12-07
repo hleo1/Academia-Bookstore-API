@@ -81,16 +81,20 @@ router.put("/api/users/:id", checkToken, async (req, res, next) => {
     }
 
     //customer cannot update their role!
-    if (req.user.role === "CUSTOMER" && role) {
+    //furthermore, only admins or customers that update their own profile may do so
+    if (
+      (req.user.role === "CUSTOMER" && role) ||
+      !(
+        req.user.role === "ADMIN" ||
+        (req.user.role === "CUSTOMER" && req.user.sub === id)
+      )
+    ) {
       throw new ApiError(403, "You are not authorized to perform this action.");
-    }
-
-    if (req.user.role === "ADMIN" || (req.user.role === "CUSTOMER" && req.user.sub === id)) {
+    } else {
       const data = await users.update(id, { password, role });
       res.json({ data });
-    } else {
-      throw new ApiError(403, "You are not authorized to perform this action.");
     }
+    
   } catch (err) {
     next(err);
   }
