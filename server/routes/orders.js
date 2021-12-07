@@ -30,7 +30,7 @@ router.get("/api/orders", checkToken, async (req, res, next) => {
 router.get("/api/orders/:id", checkToken, async (req, res, next) => {
   try {
     const { id } = req.params;
-    const data = await orders.read(id, req.user.sub, req.user.role);
+    const [data] = await orders.read(id, req.user.sub, req.user.role);
     res.json({ data });
   } catch (err) {
     next(err);
@@ -74,7 +74,7 @@ router.put("/api/orders/:id", checkToken, async (req, res, next) => {
 router.delete("/api/orders/:id", checkToken, async (req, res, next) => {
   try {
     const { id } = req.params;
-    const data = await orders.delete(id, req.user.sub);
+    const [data] = await orders.delete(id, req.user.sub);
     res.json({ data });
   } catch (err) {
     next(err);

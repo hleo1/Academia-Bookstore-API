@@ -1,5 +1,13 @@
 "use strict";
 
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+
+function _iterableToArrayLimit(arr, i) { if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) { return; } var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
 var express = require("express");
 
 var _require = require("../util/middleware"),
@@ -63,7 +71,8 @@ router.get("/api/orders", checkToken, function _callee(req, res, next) {
   }, null, null, [[1, 12]]);
 });
 router.get("/api/orders/:id", checkToken, function _callee2(req, res, next) {
-  var id, data;
+  var id, _ref, _ref2, data;
+
   return regeneratorRuntime.async(function _callee2$(_context2) {
     while (1) {
       switch (_context2.prev = _context2.next) {
@@ -74,24 +83,26 @@ router.get("/api/orders/:id", checkToken, function _callee2(req, res, next) {
           return regeneratorRuntime.awrap(orders.read(id, req.user.sub, req.user.role));
 
         case 4:
-          data = _context2.sent;
+          _ref = _context2.sent;
+          _ref2 = _slicedToArray(_ref, 1);
+          data = _ref2[0];
           res.json({
             data: data
           });
-          _context2.next = 11;
+          _context2.next = 13;
           break;
 
-        case 8:
-          _context2.prev = 8;
+        case 10:
+          _context2.prev = 10;
           _context2.t0 = _context2["catch"](0);
           next(_context2.t0);
 
-        case 11:
+        case 13:
         case "end":
           return _context2.stop();
       }
     }
-  }, null, null, [[0, 8]]);
+  }, null, null, [[0, 10]]);
 });
 router.post("/api/orders", checkToken, function _callee3(req, res, next) {
   var products, customer, data;
@@ -179,7 +190,8 @@ router.put("/api/orders/:id", checkToken, function _callee4(req, res, next) {
   }, null, null, [[0, 13]]);
 });
 router["delete"]("/api/orders/:id", checkToken, function _callee5(req, res, next) {
-  var id, data;
+  var id, _ref3, _ref4, data;
+
   return regeneratorRuntime.async(function _callee5$(_context5) {
     while (1) {
       switch (_context5.prev = _context5.next) {
@@ -190,23 +202,25 @@ router["delete"]("/api/orders/:id", checkToken, function _callee5(req, res, next
           return regeneratorRuntime.awrap(orders["delete"](id, req.user.sub));
 
         case 4:
-          data = _context5.sent;
+          _ref3 = _context5.sent;
+          _ref4 = _slicedToArray(_ref3, 1);
+          data = _ref4[0];
           res.json({
             data: data
           });
-          _context5.next = 11;
+          _context5.next = 13;
           break;
 
-        case 8:
-          _context5.prev = 8;
+        case 10:
+          _context5.prev = 10;
           _context5.t0 = _context5["catch"](0);
           next(_context5.t0);
 
-        case 11:
+        case 13:
         case "end":
           return _context5.stop();
       }
     }
-  }, null, null, [[0, 8]]);
+  }, null, null, [[0, 10]]);
 });
 module.exports = router;

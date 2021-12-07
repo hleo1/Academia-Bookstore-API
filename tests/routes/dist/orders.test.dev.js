@@ -17,6 +17,8 @@ var OrderDao = require("../../server/data/OrderDao");
 
 var ProductDao = require("../../server/data/ProductDao");
 
+var Order = require("../../server/model/Order");
+
 var users = new UserDao();
 var order = new OrderDao();
 var products = new ProductDao();
@@ -501,11 +503,7 @@ describe("Test ".concat(endpoint, " endpoints"), function () {
           }
         });
       });
-    }); // afterAll(async () => {
-    //   for (const sample of sample_orders) {
-    //     await order.delete(sample._id, sample.customer);
-    //   }
-    // });
+    });
   });
   describe("Test GET ".concat(endpoint, "/:id"), function () {
     test("Return 404 for invalid order ID", function _callee15() {
@@ -556,7 +554,6 @@ describe("Test ".concat(endpoint, " endpoints"), function () {
         while (1) {
           switch (_context17.prev = _context17.next) {
             case 0:
-              // TODO Implement me!
               orderID = sample_orders[0]._id;
               _context17.next = 3;
               return regeneratorRuntime.awrap(request.get("".concat(endpoint, "/").concat(orderID)).set("authorization", "Bearer ".concat(tokens.invalid)));
@@ -602,7 +599,6 @@ describe("Test ".concat(endpoint, " endpoints"), function () {
         while (1) {
           switch (_context19.prev = _context19.next) {
             case 0:
-              // TODO Implement me!
               orderID = sample_orders[0]._id;
               _context19.next = 3;
               return regeneratorRuntime.awrap(request.get("".concat(endpoint, "/").concat(orderID)).set("authorization", "Bearer ".concat(tokens.expiredAdmin)));
@@ -625,7 +621,6 @@ describe("Test ".concat(endpoint, " endpoints"), function () {
           while (1) {
             switch (_context20.prev = _context20.next) {
               case 0:
-                // TODO Implement me!
                 orderID = sample_orders[1]._id;
                 _context20.next = 3;
                 return regeneratorRuntime.awrap(request.get("".concat(endpoint, "/").concat(orderID)).set("authorization", "Bearer ".concat(tokens.admin)));
@@ -633,9 +628,10 @@ describe("Test ".concat(endpoint, " endpoints"), function () {
               case 3:
                 response = _context20.sent;
                 expect(response.status).toBe(200);
-                expect(response.body.data.length).toBe(1);
+                expect(response.body.data.total).toBe(99.99);
+                expect(response.body.data.status).toBe("COMPLETE");
 
-              case 6:
+              case 7:
               case "end":
                 return _context20.stop();
             }
@@ -648,7 +644,6 @@ describe("Test ".concat(endpoint, " endpoints"), function () {
           while (1) {
             switch (_context21.prev = _context21.next) {
               case 0:
-                // TODO Implement me!
                 //customer1 did in fact order sample_orders[1]!
                 orderID = sample_orders[1]._id;
                 _context21.next = 3;
@@ -657,9 +652,10 @@ describe("Test ".concat(endpoint, " endpoints"), function () {
               case 3:
                 response = _context21.sent;
                 expect(response.status).toBe(200);
-                expect(response.body.data.length).toBe(1);
+                expect(response.body.data.total).toBe(99.99);
+                expect(response.body.data.status).toBe("COMPLETE");
 
-              case 6:
+              case 7:
               case "end":
                 return _context21.stop();
             }
@@ -899,7 +895,6 @@ describe("Test ".concat(endpoint, " endpoints"), function () {
         while (1) {
           switch (_context32.prev = _context32.next) {
             case 0:
-              // TODO Implement me!
               invalid_id = new mongoose.Types.ObjectId();
               _context32.next = 3;
               return regeneratorRuntime.awrap(request.put("".concat(endpoint, "/").concat(invalid_id)).set("authorization", "Bearer ".concat(tokens.customer1)));
@@ -1294,10 +1289,9 @@ describe("Test ".concat(endpoint, " endpoints"), function () {
             case 2:
               response = _context50.sent;
               expect(response.status).toBe(200);
-              expect(response.body.data.length).toBe(1);
-              expect(response.body.data[0]._id).toBe(sample_orders[1]._id);
+              expect(response.body.data._id).toBe(sample_orders[1]._id);
 
-            case 6:
+            case 5:
             case "end":
               return _context50.stop();
           }
@@ -1306,22 +1300,193 @@ describe("Test ".concat(endpoint, " endpoints"), function () {
     });
   });
   afterAll(function _callee51() {
+    var _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, curr_order, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, product, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, sample;
+
     return regeneratorRuntime.async(function _callee51$(_context51) {
       while (1) {
         switch (_context51.prev = _context51.next) {
           case 0:
-            _context51.next = 2;
+            //delete everything in the database and clean up database!
+            _iteratorNormalCompletion = true;
+            _didIteratorError = false;
+            _iteratorError = undefined;
+            _context51.prev = 3;
+            _iterator = sample_orders[Symbol.iterator]();
+
+          case 5:
+            if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
+              _context51.next = 12;
+              break;
+            }
+
+            curr_order = _step.value;
+            _context51.next = 9;
+            return regeneratorRuntime.awrap(Order.findByIdAndDelete(curr_order._id).lean().select("-__v"));
+
+          case 9:
+            _iteratorNormalCompletion = true;
+            _context51.next = 5;
+            break;
+
+          case 12:
+            _context51.next = 18;
+            break;
+
+          case 14:
+            _context51.prev = 14;
+            _context51.t0 = _context51["catch"](3);
+            _didIteratorError = true;
+            _iteratorError = _context51.t0;
+
+          case 18:
+            _context51.prev = 18;
+            _context51.prev = 19;
+
+            if (!_iteratorNormalCompletion && _iterator["return"] != null) {
+              _iterator["return"]();
+            }
+
+          case 21:
+            _context51.prev = 21;
+
+            if (!_didIteratorError) {
+              _context51.next = 24;
+              break;
+            }
+
+            throw _iteratorError;
+
+          case 24:
+            return _context51.finish(21);
+
+          case 25:
+            return _context51.finish(18);
+
+          case 26:
+            _iteratorNormalCompletion2 = true;
+            _didIteratorError2 = false;
+            _iteratorError2 = undefined;
+            _context51.prev = 29;
+            _iterator2 = sample_products[Symbol.iterator]();
+
+          case 31:
+            if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
+              _context51.next = 38;
+              break;
+            }
+
+            product = _step2.value;
+            _context51.next = 35;
+            return regeneratorRuntime.awrap(products["delete"](product._id));
+
+          case 35:
+            _iteratorNormalCompletion2 = true;
+            _context51.next = 31;
+            break;
+
+          case 38:
+            _context51.next = 44;
+            break;
+
+          case 40:
+            _context51.prev = 40;
+            _context51.t1 = _context51["catch"](29);
+            _didIteratorError2 = true;
+            _iteratorError2 = _context51.t1;
+
+          case 44:
+            _context51.prev = 44;
+            _context51.prev = 45;
+
+            if (!_iteratorNormalCompletion2 && _iterator2["return"] != null) {
+              _iterator2["return"]();
+            }
+
+          case 47:
+            _context51.prev = 47;
+
+            if (!_didIteratorError2) {
+              _context51.next = 50;
+              break;
+            }
+
+            throw _iteratorError2;
+
+          case 50:
+            return _context51.finish(47);
+
+          case 51:
+            return _context51.finish(44);
+
+          case 52:
+            _iteratorNormalCompletion3 = true;
+            _didIteratorError3 = false;
+            _iteratorError3 = undefined;
+            _context51.prev = 55;
+            _iterator3 = sample_users[Symbol.iterator]();
+
+          case 57:
+            if (_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done) {
+              _context51.next = 64;
+              break;
+            }
+
+            sample = _step3.value;
+            _context51.next = 61;
+            return regeneratorRuntime.awrap(users["delete"](sample._id));
+
+          case 61:
+            _iteratorNormalCompletion3 = true;
+            _context51.next = 57;
+            break;
+
+          case 64:
+            _context51.next = 70;
+            break;
+
+          case 66:
+            _context51.prev = 66;
+            _context51.t2 = _context51["catch"](55);
+            _didIteratorError3 = true;
+            _iteratorError3 = _context51.t2;
+
+          case 70:
+            _context51.prev = 70;
+            _context51.prev = 71;
+
+            if (!_iteratorNormalCompletion3 && _iterator3["return"] != null) {
+              _iterator3["return"]();
+            }
+
+          case 73:
+            _context51.prev = 73;
+
+            if (!_didIteratorError3) {
+              _context51.next = 76;
+              break;
+            }
+
+            throw _iteratorError3;
+
+          case 76:
+            return _context51.finish(73);
+
+          case 77:
+            return _context51.finish(70);
+
+          case 78:
+            _context51.next = 80;
             return regeneratorRuntime.awrap(mongoose.connection.db.dropDatabase());
 
-          case 2:
-            _context51.next = 4;
+          case 80:
+            _context51.next = 82;
             return regeneratorRuntime.awrap(mongoose.connection.close());
 
-          case 4:
+          case 82:
           case "end":
             return _context51.stop();
         }
       }
-    });
+    }, null, null, [[3, 14, 18, 26], [19,, 21, 25], [29, 40, 44, 52], [45,, 47, 51], [55, 66, 70, 78], [71,, 73, 77]]);
   });
 }); //close database properly with "afterAll"

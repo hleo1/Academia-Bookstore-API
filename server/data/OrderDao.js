@@ -134,9 +134,11 @@ class OrderDao {
 
       const attributes = {};
 
-      let total = 0;
+      
       if (products) {
+        let total = 0;
         attributes.products = products;
+        //calculate new total
         for (const product of products) {
           if (isNaN(product.quantity) || product.quantity <= 0) {
             throw new ApiError(400, "Product has invalid quantity!");
@@ -151,12 +153,13 @@ class OrderDao {
 
           total += product.quantity * product_info.price;
         }
+        attributes.total = total;
       }
       if (status) {
         attributes.status = status;
       }
 
-      attributes.total = total;
+      
       const new_order = await Order.findByIdAndUpdate(id, attributes, {
         new: true,
         runValidators: true,

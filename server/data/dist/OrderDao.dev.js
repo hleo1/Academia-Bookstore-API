@@ -382,14 +382,15 @@ function () {
 
             case 5:
               attributes = {};
-              total = 0;
 
               if (!products) {
-                _context5.next = 41;
+                _context5.next = 42;
                 break;
               }
 
-              attributes.products = products;
+              total = 0;
+              attributes.products = products; //calculate new total
+
               _iteratorNormalCompletion4 = true;
               _didIteratorError4 = false;
               _iteratorError4 = undefined;
@@ -468,11 +469,13 @@ function () {
               return _context5.finish(33);
 
             case 41:
+              attributes.total = total;
+
+            case 42:
               if (status) {
                 attributes.status = status;
               }
 
-              attributes.total = total;
               _context5.next = 45;
               return regeneratorRuntime.awrap(Order.findByIdAndUpdate(id, attributes, {
                 "new": true,

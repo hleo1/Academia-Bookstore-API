@@ -9,6 +9,8 @@ const UserDao = require("../../server/data/UserDao");
 const OrderDao = require("../../server/data/OrderDao");
 const ProductDao = require("../../server/data/ProductDao");
 
+const Order = require("../../server/model/Order");
+
 const users = new UserDao();
 const order = new OrderDao();
 const products = new ProductDao();
@@ -265,12 +267,6 @@ describe(`Test ${endpoint} endpoints`, () => {
         expect(response.body.data.length).toBe(0);
       });
     });
-
-    // afterAll(async () => {
-    //   for (const sample of sample_orders) {
-    //     await order.delete(sample._id, sample.customer);
-    //   }
-    // });
   });
 
   describe(`Test GET ${endpoint}/:id`, () => {
@@ -289,8 +285,6 @@ describe(`Test ${endpoint} endpoints`, () => {
     });
 
     test("Return 403 for invalid token", async () => {
-      // TODO Implement me!
-
       const orderID = sample_orders[0]._id;
       const response = await request
         .get(`${endpoint}/${orderID}`)
@@ -310,7 +304,6 @@ describe(`Test ${endpoint} endpoints`, () => {
     });
 
     test("Return 403 for expired token", async () => {
-      // TODO Implement me!
       const orderID = sample_orders[0]._id;
       const response = await request
         .get(`${endpoint}/${orderID}`)
@@ -320,24 +313,24 @@ describe(`Test ${endpoint} endpoints`, () => {
 
     describe("Return 200 and the order for successful request", () => {
       test("Admin can see any order", async () => {
-        // TODO Implement me!
         const orderID = sample_orders[1]._id;
         const response = await request
           .get(`${endpoint}/${orderID}`)
           .set("authorization", `Bearer ${tokens.admin}`);
         expect(response.status).toBe(200);
-        expect(response.body.data.length).toBe(1);
+        expect(response.body.data.total).toBe(99.99);
+        expect(response.body.data.status).toBe("COMPLETE");
       });
 
       test("Customer can see their order only", async () => {
-        // TODO Implement me!
         //customer1 did in fact order sample_orders[1]!
         const orderID = sample_orders[1]._id;
         const response = await request
           .get(`${endpoint}/${orderID}`)
           .set("authorization", `Bearer ${tokens.customer1}`);
         expect(response.status).toBe(200);
-        expect(response.body.data.length).toBe(1);
+        expect(response.body.data.total).toBe(99.99);
+        expect(response.body.data.status).toBe("COMPLETE");
       });
     });
   });
@@ -372,7 +365,7 @@ describe(`Test ${endpoint} endpoints`, () => {
     test("Return 404 for non-existing customer", async () => {
       // A token with a user ID that resembles a valid mongoose ID
       //  however, there is no user in the database with that ID!
-      // TODO Implement me!
+
       const response = await request
         .post(endpoint)
         .set("authorization", `Bearer ${tokens.nonexistentcustomer}`);
@@ -380,7 +373,6 @@ describe(`Test ${endpoint} endpoints`, () => {
     });
 
     test("Return 400 for missing payload", async () => {
-      // TODO Implement me!
       const response = await request
         .post(endpoint)
         .set("authorization", `Bearer ${tokens.customer1}`);
@@ -389,7 +381,6 @@ describe(`Test ${endpoint} endpoints`, () => {
 
     test("Return 400 for invalid quantity attribute", async () => {
       // Quantity attribute for each product must be a positive value.
-      // TODO Implement me!
 
       const response = await request
         .post(endpoint)
@@ -408,7 +399,6 @@ describe(`Test ${endpoint} endpoints`, () => {
     test("Return 404 for non-existing product attribute", async () => {
       // A product ID that resembles a valid mongoose ID
       //  however, there is no product in the database with that ID!
-      // TODO Implement me!
 
       const response = await request
         .post(endpoint)
@@ -422,12 +412,11 @@ describe(`Test ${endpoint} endpoints`, () => {
         })
         .set("authorization", `Bearer ${tokens.customer1}`);
       expect(response.status).toBe(404);
-
     });
 
     test("Return 400 for invalid product attribute", async () => {
       // A product ID that is not even a valid mongoose ID!
-      // TODO Implement me!
+
       const response = await request
         .post(endpoint)
         .send({
@@ -448,7 +437,7 @@ describe(`Test ${endpoint} endpoints`, () => {
       // Moreover, when an order is placed, its status is ACTIVE.
       // The client only provides the list of products.
       // The API shall calculate the total price!
-      // TODO Implement me!
+
       const response = await request
         .post(endpoint)
         .send({
@@ -466,10 +455,8 @@ describe(`Test ${endpoint} endpoints`, () => {
     });
   });
 
-
-describe(`Test PUT ${endpoint}/:id`, () => {
-    test("Return 404 for invalid order ID", async () => { 
-      // TODO Implement me!
+  describe(`Test PUT ${endpoint}/:id`, () => {
+    test("Return 404 for invalid order ID", async () => {
       const invalid_id = new mongoose.Types.ObjectId();
       const response = await request
         .put(`${endpoint}/${invalid_id}`)
@@ -478,14 +465,11 @@ describe(`Test PUT ${endpoint}/:id`, () => {
     });
 
     test("Return 403 for missing token", async () => {
-      // TODO Implement me!
-      const response = await request
-        .put(`${endpoint}/${sample_orders[0]._id}`)
+      const response = await request.put(`${endpoint}/${sample_orders[0]._id}`);
       expect(response.status).toBe(403);
     });
 
     test("Return 403 for invalid token", async () => {
-      // TODO Implement me!
       const response = await request
         .put(`${endpoint}/${sample_orders[0]._id}`)
         .set("authorization", `Bearer ${tokens.invalid}`);
@@ -494,26 +478,23 @@ describe(`Test PUT ${endpoint}/:id`, () => {
 
     describe("Return 403 for unauthorized token", () => {
       test("Admins not allowed to update others' orders", async () => {
-        // TODO Implement me!
         //sample_user[1] ordered sample_rders[1], therefore admin shouldn't be allowed this update
         const response = await request
-        .put(`${endpoint}/${sample_orders[1]._id}`)
-        .set("authorization", `Bearer ${tokens.admin}`);
-      expect(response.status).toBe(403);
+          .put(`${endpoint}/${sample_orders[1]._id}`)
+          .set("authorization", `Bearer ${tokens.admin}`);
+        expect(response.status).toBe(403);
       });
 
       test("Customers not allowed to update others' orders", async () => {
-        // TODO Implement me!
         //sample_user[1] ordered sample_orders[1], therefore customer2 should be denied
         const response = await request
-        .put(`${endpoint}/${sample_orders[1]._id}`)
-        .set("authorization", `Bearer ${tokens.customer2}`);
-      expect(response.status).toBe(403);
+          .put(`${endpoint}/${sample_orders[1]._id}`)
+          .set("authorization", `Bearer ${tokens.customer2}`);
+        expect(response.status).toBe(403);
       });
     });
 
     test("Return 403 for expired token", async () => {
-      // TODO Implement me!
       const response = await request
         .put(`${endpoint}/${sample_orders[1]._id}`)
         .set("authorization", `Bearer ${tokens.expiredAdmin}`);
@@ -530,81 +511,61 @@ describe(`Test PUT ${endpoint}/:id`, () => {
     test("Return 400 for invalid status attribute", async () => {
       const response = await request
         .put(`${endpoint}/${sample_orders[1]._id}`)
-        .set("authorization", `Bearer ${tokens.customer1}`).send(
-          {
-            products: [
-              create_product_object(sample_products[0], 3)
-            ],
-            status: "DEFINITELY NOT A VALID STATUS"
-          }
-
-        );
+        .set("authorization", `Bearer ${tokens.customer1}`)
+        .send({
+          products: [create_product_object(sample_products[0], 3)],
+          status: "DEFINITELY NOT A VALID STATUS",
+        });
       expect(response.status).toBe(400);
     });
-
 
     //added test
     test("Return 400 for invalid product attribute", async () => {
       const response = await request
         .put(`${endpoint}/${sample_orders[1]._id}`)
-        .set("authorization", `Bearer ${tokens.customer1}`).send(
-          {
-            products: [
-              create_product_object({_id: "I'm def not valid!"}, 3),
-            ],
-            status: "ACTIVE"
-          }
-
-        );
+        .set("authorization", `Bearer ${tokens.customer1}`)
+        .send({
+          products: [create_product_object({ _id: "I'm def not valid!" }, 3)],
+          status: "ACTIVE",
+        });
       expect(response.status).toBe(400);
     });
 
     test("Return 400 for invalid quantity attribute", async () => {
       const response = await request
         .put(`${endpoint}/${sample_orders[1]._id}`)
-        .set("authorization", `Bearer ${tokens.customer1}`).send(
-          {
-            products: [
-              create_product_object(sample_products[0], -1),
-            ],
-            status: "ACTIVE"
-          }
-
-        );
+        .set("authorization", `Bearer ${tokens.customer1}`)
+        .send({
+          products: [create_product_object(sample_products[0], -1)],
+          status: "ACTIVE",
+        });
       expect(response.status).toBe(400);
     });
 
     describe("Return 200 and the updated order for successful request", () => {
       test("Update products, e.g., add/remove or change quantity", async () => {
         const response = await request
-        .put(`${endpoint}/${sample_orders[1]._id}`)
-        .set("authorization", `Bearer ${tokens.customer1}`)
-        .send(
-          {
-            products: [
-              create_product_object(sample_products[0], 3),
-            ],
-          }
-        );
-      expect(response.status).toBe(200);
-      expect(response.body.data.total).toBe(sample_products[0].price * 3);
+          .put(`${endpoint}/${sample_orders[1]._id}`)
+          .set("authorization", `Bearer ${tokens.customer1}`)
+          .send({
+            products: [create_product_object(sample_products[0], 3)],
+          });
+        expect(response.status).toBe(200);
+        expect(response.body.data.total).toBe(sample_products[0].price * 3);
       });
 
       test("Update status, e.g., from ACTIVE to COMPLETE", async () => {
-        // TODO Implement me!
         const response = await request
-        .put(`${endpoint}/${sample_orders[1]._id}`)
-        .set("authorization", `Bearer ${tokens.customer1}`).send(
-          {
-            status: "COMPLETE"
-          }
-        );
-      expect(response.status).toBe(200);
-      expect(response.body.data.status).toBe("COMPLETE");
+          .put(`${endpoint}/${sample_orders[1]._id}`)
+          .set("authorization", `Bearer ${tokens.customer1}`)
+          .send({
+            status: "COMPLETE",
+          });
+        expect(response.status).toBe(200);
+        expect(response.body.data.status).toBe("COMPLETE");
       });
     });
   });
-  
 
   describe(`Test DELETE ${endpoint}/:id`, () => {
     test("Return 404 for invalid order ID", async () => {
@@ -616,8 +577,9 @@ describe(`Test PUT ${endpoint}/:id`, () => {
     });
 
     test("Return 403 for missing token", async () => {
-      const response = await request
-        .delete(`${endpoint}/${sample_orders[0]._id}`)
+      const response = await request.delete(
+        `${endpoint}/${sample_orders[0]._id}`
+      );
       expect(response.status).toBe(403);
     });
 
@@ -630,20 +592,19 @@ describe(`Test PUT ${endpoint}/:id`, () => {
 
     describe("Return 403 for unauthorized token", () => {
       test("Admins not allowed to delete others' orders", async () => {
-         //sample_user[1] ordered sample_rders[1], therefore admin shouldn't be allowed this update
-         const response = await request
-         .delete(`${endpoint}/${sample_orders[1]._id}`)
-         .set("authorization", `Bearer ${tokens.admin}`);
-       expect(response.status).toBe(403);
+        //sample_user[1] ordered sample_rders[1], therefore admin shouldn't be allowed this update
+        const response = await request
+          .delete(`${endpoint}/${sample_orders[1]._id}`)
+          .set("authorization", `Bearer ${tokens.admin}`);
+        expect(response.status).toBe(403);
       });
 
       test("Customers not allowed to delete others' orders", async () => {
-        // TODO Implement me!
         //sample_user[1] ordered sample_orders[1], therefore customer2 should be denied
         const response = await request
-        .delete(`${endpoint}/${sample_orders[1]._id}`)
-        .set("authorization", `Bearer ${tokens.customer2}`);
-      expect(response.status).toBe(403);
+          .delete(`${endpoint}/${sample_orders[1]._id}`)
+          .set("authorization", `Bearer ${tokens.customer2}`);
+        expect(response.status).toBe(403);
       });
     });
 
@@ -660,12 +621,25 @@ describe(`Test PUT ${endpoint}/:id`, () => {
         .delete(`${endpoint}/${sample_orders[1]._id}`)
         .set("authorization", `Bearer ${tokens.customer1}`);
       expect(response.status).toBe(200);
-      expect(response.body.data.length).toBe(1);
-      expect(response.body.data[0]._id).toBe(sample_orders[1]._id);
+      expect(response.body.data._id).toBe(sample_orders[1]._id);
     });
   });
 
   afterAll(async () => {
+
+    //delete everything in the database and clean up database!
+    for (const curr_order of sample_orders) {
+      await Order.findByIdAndDelete(curr_order._id).lean().select("-__v");
+    }
+    for (const product of sample_products) {
+      await products.delete(product._id);
+    }
+    for (const sample of sample_users) {
+      await users.delete(sample._id);
+    }
+
+    
+
     await mongoose.connection.db.dropDatabase();
     await mongoose.connection.close();
   });
